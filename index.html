@@ -1,0 +1,307 @@
+<!doctype html>
+<!--
+  Copyright 2016 Google Inc. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+      https://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Demonstrates the use of Google Cloud Database with a Firebase DB">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Database Quickstart</title>
+
+  <!-- Disable tap highlight on IE -->
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Firebase Database Quickstart">
+  <meta name="theme-color" content="#303F9F">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Firebase Database Quickstart">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
+
+  <!-- Tile icon for Win8 -->
+  <meta name="msapplication-TileColor" content="#3372DF">
+  <meta name="msapplication-navbutton-color" content="#303F9F">
+
+  <!-- Material Design Lite -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-orange.min.css">
+  <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+  <link rel="stylesheet" href="main.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="scripts/jquery-ui.min.js"></script>
+  <script src="scripts/jquery.validate.js"></script>
+
+  <!-- Firebase -->
+  <!-- *******************************************************************************
+       * TODO(DEVELOPER): Paste the initialization snippet by navigating to:
+
+        https://console.firebase.google.com
+
+       and choosing a project you've created.  Then click the red HTML logo at the top
+       right of the page with the caption "Add Firebase to your web app".
+
+       Copy the snippet that appears in place of this comment.
+       *************************************************************************** -->
+
+<script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDSxBRrGw3f0GjBjAVY9T1YqYD7ltXcYdI",
+    authDomain: "authentication-ce34f.firebaseapp.com",
+    databaseURL: "https://authentication-ce34f.firebaseio.com",
+    storageBucket: "authentication-ce34f.appspot.com",
+  };
+  firebase.initializeApp(config);
+
+  // Get a reference to the database service
+  var database = firebase.database();
+</script>
+
+
+</head>
+<body>
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+
+  <!-- Splash screen -->
+  <section id="page-splash">
+    <h3 class="logo">Database Web Quickstart</h3>
+    <div>
+      <button id="sign-in-button" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign in with Gmail</button>
+    </div>
+  </section>
+
+  <!-- Header section containing logo and menu -->
+  <header class="header mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
+
+    <div class="mdl-layout__header-row titlebar">
+      <h3 class="logo">Database Web Quickstart</h3>
+      <button id="sign-out-button" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign out</button>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="tab mdl-layout__header-row mdl-color--light-blue-600">
+      <div class="mdl-tab">
+        <div id="menu-recent" class="mdl-layout__tab is-active mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">new_releases</i> Recent
+        </div>
+        <div id="menu-my-events" class="mdl-layout__tab mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">home</i> My events
+        </div>
+        <div id="menu-my-top-events" class="mdl-layout__tab mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">trending_up</i> My top events
+        </div>
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-color--amber-400 mdl-shadow--4dp mdl-js-ripple-effect" id="add">
+          <i class="material-icons">mode_edit</i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mdl-layout__content mdl-color--grey-100">
+
+    <!-- Show the add event form -->
+    <section class="mdl-grid content" id="add-event" style="display:none">
+      <div class="mdl-cell mdl-cell--12-col mdl-grid">
+
+          <!-- Card containing the inputs to add a new messages -->
+          <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--8-col-tablet
+                  mdl-cell--6-col-desktop">
+            <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
+              <h2 class="mdl-card__title-text">New Event</h2>
+            </div>
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+              <form id="event-form" action="#" novalidate>
+                <div class="progress">
+                  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuemin="2" aria-valuemax="100"></div>
+                  </div>
+                  <div class="step">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-name">
+                    <label class="mdl-textfield__label" for="new-event-name">What do you want to name your event?</label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label class="mdl-textfield__label" for="new-event-type">What type of event is it?</label>
+                    <input class="mdl-textfield__input" type="text" id="new-event-type">
+                    <datalist id="new-event-type">
+                      <option value="Birthday">
+                      <option value="Anniversary">
+                      <option value="Farewell">
+                      <option value="New Year">
+                    </datalist>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-host">
+                    <label class="mdl-textfield__label" for="new-event-host">Who is hosting the event?</label>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label class="mdl-textfield__label" for="new-event-start-time">When the event will start?</label>
+                    <input class="mdl-textfield__input" type="date" id="new-event-start-date" placeholder="">
+                    <input class="mdl-textfield__input" type="time" step=900 id="new-event-start-time">
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label class="mdl-textfield__label" for="new-event-end-time">When the event will end?</label>
+                    <input class="mdl-textfield__input" type="date" id="new-event-end-date" placeholder="">
+                    <input class="mdl-textfield__input" type="time" id="new-event-end-time">
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label for="new-event-is-repetitive">
+                      <input type="checkbox" id="new-event-is-repetitive"><span> Do you want to schedule it to be repetitive?</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-location">
+                    <label class="mdl-textfield__label" for="new-event-location">What is the location for the event?</label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-guests">
+                    <label class="mdl-textfield__label" for="new-event-guests">Whom do you want to invite for the event?</label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <textarea class="mdl-textfield__input" rows="3" id="new-event-message"></textarea>
+                    <label class="mdl-textfield__label" for="new-event-message">Any message for the guests?</label>
+                  </div>
+                </div>
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect action btn-hot text-capitalize back btn">Back</button>
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect action btn-hot  text-capitalize next btn">Next</button>
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect action btn-hot  text-capitalize create btn"">
+                  Create
+                </button>
+              </form>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Show a list of recent events -->
+    <section class="mdl-grid content" id="recent-events-list" style="display:none">
+      <div class="events-container mdl-cell mdl-cell--12-col mdl-grid">
+      </div>
+    </section>
+
+    <!-- Show the list of user's events -->
+    <section class="mdl-grid content" id="user-events-list" style="display:none">
+      <div class="events-container mdl-cell mdl-cell--12-col mdl-grid">
+      </div>
+    </section>
+
+    <!-- Show the list of top user's events -->
+    <section class="mdl-grid content" id="top-user-events-list" style="display:none">
+      <div class="events-container mdl-cell mdl-cell--12-col mdl-grid">
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="scripts/main.js"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    var current = 1;
+
+    widget      = $(".step");
+    btnnext     = $(".next");
+    btnback     = $(".back");
+    btnsubmit   = $(".create");
+
+    // Init buttons and UI
+    widget.not(':eq(0)').hide();
+    hideButtons(current);
+    setProgress(current);
+
+    // Next button click action
+    btnnext.click(function(){
+      if(current < widget.length){
+        // Check validation
+//        if($(".form").valid()){
+          widget.show();
+          widget.not(':eq('+(current++)+')').hide();
+          setProgress(current);
+//        }
+      }
+      hideButtons(current);
+    })
+
+    // Back button click action
+    btnback.click(function(){
+      if(current > 1){
+        current = current - 2;
+        if(current < widget.length){
+          widget.show();
+          widget.not(':eq('+(current++)+')').hide();
+          setProgress(current);
+        }
+      }
+      hideButtons(current);
+    })
+/*
+      $('.form').validate({ // initialize plugin
+      ignore:":not(:visible)",
+      rules: {
+        name     : "required",
+        email    : {required : true, email:true},
+        country  : "required",
+        username : "required",
+        password : "required",
+        rpassword: { required : true, equalTo: "#password"},
+      },
+      });
+*/
+  });
+
+  // Change progress bar action
+  setProgress = function(currstep){
+    var percent = parseFloat(100 / widget.length) * (currstep -1 );
+    if (percent == 0) {
+      percent = 2;
+    }
+    percent = percent.toFixed();
+    $(".progress-bar").css("width",percent+"%").html(percent+"%");
+  }
+
+  // Hide buttons according to the current step
+  hideButtons = function(current){
+    var limit = parseInt(widget.length);
+
+    $(".action").hide();
+
+    if(current < limit) btnnext.show();
+    if(current > 1) btnback.show();
+
+    if (current == limit) {
+      // Show entered values
+/*      $(".display label:not(.control-label)").each(function(){
+        console.log($(this).find("label:not(.control-label)").html($("#"+$(this).data("id")).val()));
+      });
+*/
+      btnnext.hide();
+      btnsubmit.show();
+    }
+  }
+</script>
+
+</body>
+</html>
