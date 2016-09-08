@@ -17,6 +17,10 @@
 
 // Shortcuts to DOM Elements.
 var eventForm = document.getElementById('event-form');
+var eventFormStep1 = document.getElementById('step1');
+var eventFormStep2 = document.getElementById('step2');
+var eventFormStep3 = document.getElementById('step3');
+var eventFormStep4 = document.getElementById('step4');
 var eventNameInput = document.getElementById('new-event-name');
 var eventTypeInput = document.getElementById('new-event-type');
 var eventHostInput = document.getElementById('new-event-host');
@@ -24,7 +28,6 @@ var eventStartDateInput = document.getElementById('new-event-start-date');
 var eventStartTimeInput = document.getElementById('new-event-start-time');
 var eventEndDateInput = document.getElementById('new-event-end-date');
 var eventEndTimeInput = document.getElementById('new-event-end-time');
-var eventIsRepetitiveInput = document.getElementById('new-event-is-repetitive');
 var eventLocationInput = document.getElementById('new-event-location');
 var eventGuestsInput = document.getElementById('new-event-guests');
 var eventMessageInput = document.getElementById('new-event-message');
@@ -430,10 +433,15 @@ window.addEventListener('load', function() {
     var eventStartTime = eventStartTimeInput.value;
     var eventEndDate = eventEndDateInput.value;
     var eventEndTime = eventEndTimeInput.value;
-    var eventIsRepetitive = eventIsRepetitiveInput.value;
     var eventLocation = eventLocationInput.value;
     var eventGuests = eventGuestsInput.value;
     var eventMessage = eventMessageInput.value;
+
+    // Reset the event form to show
+    // first section of the form
+    //eventForm.style.display = 'none';
+    eventFormStep4.style.display = 'none';
+    eventFormStep1.style.display = 'block';
 
     if (eventName && eventType) {
       newEventForCurrentUser(eventName, eventType, eventHost, eventStartDate, eventStartTime, eventEndDate, eventEndTime, eventLocation, eventGuests, eventMessage).then(function() {
@@ -446,7 +454,6 @@ window.addEventListener('load', function() {
       eventStartTimeInput.value = '';
       eventEndDateInput.value = '';
       eventEndTimeInput.value = '';
-      eventIsRepetitiveInput.value = '';
       eventLocationInput.value = '';
       eventGuestsInput.value = '';
       eventMessageInput.value = '';
