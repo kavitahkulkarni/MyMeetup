@@ -31,8 +31,12 @@ var eventEndTimeInput = document.getElementById('new-event-end-time');
 var eventLocationInput = document.getElementById('new-event-location');
 var eventGuestsInput = document.getElementById('new-event-guests');
 var eventMessageInput = document.getElementById('new-event-message');
+var signUpButton = document.getElementById('sign-up-button');
+var emailInput = document.getElementById('email');
+var passwordInput = document.getElementById('password');
 var signInButton = document.getElementById('sign-in-button');
 var signOutButton = document.getElementById('sign-out-button');
+var passwordResetButton = document.getElementById('password-reset-button');
 var splashPage = document.getElementById('page-splash');
 var addEvent = document.getElementById('add-event');
 var addButton = document.getElementById('add');
@@ -411,9 +415,80 @@ function showSection(sectionElement, buttonElement) {
 window.addEventListener('load', function() {
   // Bind Sign in button.
   signInButton.addEventListener('click', function() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider);
+    var email = emailInput.value;
+    var password = passwordInput.value;
+    // Sign in with email and pass.
+    // [START authwithemail]
+    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // [START_EXCLUDE]
+      if (errorCode === 'auth/wrong-password') {
+        alert('Wrong password.');
+      } else {
+        alert(errorMessage);
+      }
+      console.log(error);
+      // [END_EXCLUDE]
+    });
+    // [END authwithemail]
+      });
+
+  // Bind Sign up button.
+  signUpButton.addEventListener('click', function() {
+      var email = emailInput.value;
+      var password = passwordInput.value;
+      if (email.length < 4) {
+        alert('Please enter an email address.');
+        return;
+      }
+      if (password.length < 4) {
+        alert('Please enter a password.');
+        return;
+      }
+      // Sign in with email and pass.
+      // [START createwithemail]
+      firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // [START_EXCLUDE]
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+        console.log(error);
+        // [END_EXCLUDE]
+      });
+      // [END createwithemail]
   });
+
+  // Send password reset email to user
+  passwordResetButton .addEventListener('click', function() {
+      var email = emailInput.value;
+      // [START sendpasswordemail]
+      firebase.auth().sendPasswordResetEmail(email).then(function() {
+        // Password Reset Email Sent!
+        // [START_EXCLUDE]
+        alert('Password Reset Email Sent!');
+        // [END_EXCLUDE]
+      }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // [START_EXCLUDE]
+        if (errorCode == 'auth/invalid-email') {
+          alert(errorMessage);
+        } else if (errorCode == 'auth/user-not-found') {
+          alert(errorMessage);
+        }
+        console.log(error);
+        // [END_EXCLUDE]
+      });
+      // [END sendpasswordemail];
+    });
 
   // Bind Sign out button.
   signOutButton.addEventListener('click', function() {
