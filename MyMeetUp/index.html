@@ -15,22 +15,22 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Demonstrates the use of Google Cloud Database with a Firebase DB">
+  <meta name="description" content="Meet-up event Web Application">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Database Quickstart</title>
+  <title>My Meetup Application</title>
 
   <!-- Disable tap highlight on IE -->
   <meta name="msapplication-tap-highlight" content="no">
 
   <!-- Add to homescreen for Chrome on Android -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Firebase Database Quickstart">
+  <meta name="application-name" content="Meet-up event Web Application">
   <meta name="theme-color" content="#303F9F">
 
   <!-- Add to homescreen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Firebase Database Quickstart">
+  <meta name="apple-mobile-web-app-title" content="Meet-up event Web Application">
   <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
 
   <!-- Tile icon for Win8 -->
@@ -48,17 +48,6 @@
   <script src="scripts/jquery.validate.js"></script>
 
   <!-- Firebase -->
-  <!-- *******************************************************************************
-       * TODO(DEVELOPER): Paste the initialization snippet by navigating to:
-
-        https://console.firebase.google.com
-
-       and choosing a project you've created.  Then click the red HTML logo at the top
-       right of the page with the caption "Add Firebase to your web app".
-
-       Copy the snippet that appears in place of this comment.
-       *************************************************************************** -->
-
 <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script>
@@ -77,7 +66,6 @@
   var database = firebase.database();
 </script>
 
-
 </head>
 <body>
 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -85,10 +73,19 @@
 
   <!-- Splash screen -->
   <section id="page-splash">
-<!--    <h3 class="logo">Events!!!</h3> -->
     <h3 class="logo">Events!!!</h3>
     <div>
-      <button id="sign-in-button" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign in with Gmail</button>
+      <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="email" name="email" placeholder="Email"/>
+      &nbsp;&nbsp;&nbsp;
+      <input class="mdl-textfield__input" style="display:inline;width:auto;" type="password" id="password" name="password" placeholder="Password"/>
+      <br/><br/>
+      <button class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect" id="sign-in-button" name="signin">Sign In</button>
+      &nbsp;&nbsp;&nbsp;
+      <button class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect" id="sign-up-button" name="signup">Sign Up</button>
+      &nbsp;&nbsp;&nbsp;
+      <button class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect" id="password-reset-button" name="verify-email">Send Password Reset Email</button>
+
+<!--      <button id="sign-in-button" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign in with Gmail</button> -->
     </div>
   </section>
 
