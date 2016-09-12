@@ -411,6 +411,39 @@ function showSection(sectionElement, buttonElement) {
   }
 }
 
+function passwordCheck(password) {
+  var list = [];
+  if (password.length < 16) {
+    list.push("fewer than 16 characters");
+  } else if (password.length > 100) {
+    list.push("more than 100 characters");
+  }
+
+  if (!password.match(/[\!\@\#\$\%\^\&\*]/g)) {
+    list.push("missing a symbol (!, @, #, $, %, ^, &, *)");
+  }
+
+  if (!password.match(/\d/g)) {
+    list.push("missing a number");
+  }
+
+  if (!password.match(/[a-z]/g)) {
+    list.push("missing a lowercase character");
+  }
+
+  if(!password.match(/[A-Z]/g)) {
+    list.push("missing an uppercase character");
+  }
+
+  var illegalChar = password.match(/[^A-z0-9\!\@\#\$\%\^\&\*]/g);
+  if (illegalChar) {
+    illegalChar.forEach(function(illegal) {
+      list.push("Includes illegal character: " + illegal);
+    });
+  }
+  return list;
+}
+
 // Bindings on load.
 window.addEventListener('load', function() {
   // Bind Sign in button.
@@ -433,36 +466,37 @@ window.addEventListener('load', function() {
       // [END_EXCLUDE]
     });
     // [END authwithemail]
-      });
+  });
 
   // Bind Sign up button.
   signUpButton.addEventListener('click', function() {
-      var email = emailInput.value;
-      var password = passwordInput.value;
-      if (email.length < 4) {
-        alert('Please enter an email address.');
-        return;
+    var email = emailInput.value;
+    var password = passwordInput.value;
+    var problemList = [];
+    if (email.length < 4) {
+      alert('Please enter an email address.');
+      return;
+    }
+    if (password.length < 4) {
+      alert('Please enter a password.');
+      return;
+    }
+    // Sign in with email and pass.
+    // [START createwithemail]
+    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // [START_EXCLUDE]
+      if (errorCode == 'auth/weak-password') {
+        alert('The password is too weak.');
+      } else {
+        alert(errorMessage);
       }
-      if (password.length < 4) {
-        alert('Please enter a password.');
-        return;
-      }
-      // Sign in with email and pass.
-      // [START createwithemail]
-      firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // [START_EXCLUDE]
-        if (errorCode == 'auth/weak-password') {
-          alert('The password is too weak.');
-        } else {
-          alert(errorMessage);
-        }
-        console.log(error);
-        // [END_EXCLUDE]
-      });
-      // [END createwithemail]
+      console.log(error);
+      // [END_EXCLUDE]
+    });
+    // [END createwithemail]
   });
 
   // Send password reset email to user
