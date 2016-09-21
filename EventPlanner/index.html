@@ -1,0 +1,663 @@
+<!doctype html>
+<!--
+  Meetup event creation web application
+  This application can be used to-
+  1. Schedule the meetup event
+  2. View the recent events created by others
+  3. Like/comment on the created events
+  4. View the all/top self created events
+  Email signup is available for the application.
+  Ref: Google firebase sample application
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Meet-up event Web Application">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Meetup Application</title>
+
+  <!-- Disable tap highlight on IE -->
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Meet-up event Web Application">
+  <meta name="theme-color" content="#303F9F">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Meet-up event Web Application">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
+
+  <!-- Tile icon for Win8 -->
+  <meta name="msapplication-TileColor" content="#3372DF">
+  <meta name="msapplication-navbutton-color" content="#303F9F">
+
+  <!-- Material Design Lite -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-orange.min.css">
+  <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" type="text/css">
+  <link rel="stylesheet" href="jquery.timepicker.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="scripts/jquery-ui.min.js"></script>
+  <script src="scripts/jquery.validate.js"></script>
+  <script src="scripts/jquery.timepicker.min.js"></script>
+
+  <script>
+  $(function() {
+    var elem = document.createElement('input');
+    elem.setAttribute('type', 'date');
+    if ( elem.type === 'text' ) {
+      // Datepicker
+      $('#new-event-start-date').datepicker({dateFormat: 'yy/mm/dd', minDate: 0});
+      $('#new-event-end-date').datepicker({dateFormat: 'yy/mm/dd', minDate: 0});
+      // Timepicker
+      $('#new-event-start-time').timepicker({ 'step': 15, minTime: "09:00am", timeFormat: "H:i", show2400: true });
+      $('#new-event-end-time').timepicker({ 'step': 15, minTime: "09:00am", timeFormat: "H:i", show2400: true});
+    }
+  });
+  </script>
+
+<script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDSxBRrGw3f0GjBjAVY9T1YqYD7ltXcYdI",
+    authDomain: "authentication-ce34f.firebaseapp.com",
+    databaseURL: "https://authentication-ce34f.firebaseio.com",
+    storageBucket: "authentication-ce34f.appspot.com",
+  };
+  firebase.initializeApp(config);
+  // Get a reference to the database service
+  var database = firebase.database();
+</script>
+</head>
+<body>
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+  <!-- Splash screen -->
+  <section id="page-splash">
+    <h3 class="logo" id="title-header">Events!!!</h3>
+    <div>
+      <div class="mdl-cell mdl-cell--12-col mdl-grid">
+        <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--8-col-tablet
+                  mdl-cell--12-col-desktop">
+          <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
+            <h2 class="mdl-card__title-text welcome-page-label">Sign In</h2>
+          </div>
+          <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+          <!-- Welcome form for sign-in -->
+            <form id="welcome-form" action="#" novalidate>
+              <table cellspacing="5" >
+                <tbody>
+                  <tr>
+                    <td>
+                      <label class="visuallyhidden" for="email">Enter Email: </label>
+                    </td>
+                    <td>
+                      <label class="visuallyhidden" for="password">Enter Password: </label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input class="mdl-textfield__input" type="text" id="email" name="email" placeholder="Email" required />
+                    </td>
+                    <td>
+                      <input class="mdl-textfield__input" type="password" id="password" name="password" placeholder="Password" required/>
+                    </td>
+                    <td>
+                      <button type="submit" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect" id="sign-in-button" name="signin">Sign In</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <label for="password-reset-button">Forgot password? </label></small>
+                    </td>
+                    <td>
+                      <button type="button" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect" id="password-reset-button" name="password-reset-button">Send Password Reset Email</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+          <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
+            <h2 class="mdl-card__title-text welcome-page-label">Sign Up</h2>
+          </div>
+          <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <!-- Sign-up form -->
+            <form id="signup-form" action="#" novalidate>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <div>
+                  <label class="sign-up-label" for="new-user-name">Let's start with your name </label>
+                  <input class="mdl-textfield__input" type="text" id="new-user-name" name="new-user-name" placeholder="FirstName LastName" required>
+                </div>
+                <div>
+                  <label class="sign-up-label" for="new-user-email">What's you eMail address?</label>
+                  <input class="mdl-textfield__input" type="email" id="new-user-email" name="new-user-email" placeholder="email@domain.com" required>
+                </div>
+                <div>
+                  <label class="sign-up-label" for="confirm-new-user-email">Confirm eMail </label>
+                  <input class="mdl-textfield__input" type="email" id="confirm-new-user-email" name="confirm-new-user-email" placeholder="email@domain.com" required>
+                </div>
+                <div>
+                  <label class="sign-up-label" for="new-user-password">Choose a password </label>
+                  <input class="mdl-textfield__input" type="password" id="new-user-password" name="new-user-password" placeholder="Minimum 6 characters | Minimum one number | Minimum one uppercase" required>
+                </div>
+              </div>
+            <button type="submit" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect" id="sign-up-button" name="signup">Sign Up</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Header section containing logo and menu -->
+  <header class="header mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
+    <div class="mdl-layout__header-row titlebar">
+      <h3 class="logo">Events!!!</h3>
+      <button id="sign-out-button" class="mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign out</button>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="tab mdl-layout__header-row mdl-color--light-blue-600">
+      <div class="mdl-tab">
+        <div id="menu-recent" class="mdl-layout__tab is-active mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">new_releases</i> Recent
+        </div>
+        <div id="menu-my-events" class="mdl-layout__tab mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">home</i> My events
+        </div>
+        <div id="menu-my-top-events" class="mdl-layout__tab mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">trending_up</i> My top events
+        </div>
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-color--amber-400 mdl-shadow--4dp mdl-js-ripple-effect" id="add">
+          <i class="material-icons">mode_edit</i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mdl-layout__content mdl-color--grey-100">
+
+    <!-- Show the add event form -->
+    <section class="mdl-grid content" id="add-event" style="display:none">
+      <div class="mdl-cell mdl-cell--12-col mdl-grid">
+          <!-- Card containing the inputs to add a new messages -->
+          <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--8-col-tablet
+                  mdl-cell--6-col-desktop">
+            <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
+              <h2 class="mdl-card__title-text">New Event</h2>
+            </div>
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+              <form id="event-form" action="#" novalidate>
+                <div class="progress">
+                  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuemin="2" aria-valuemax="100"></div>
+                  </div>
+                  <br>
+                  <div class="step" id="step1">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" type="text" id="new-event-name"  name="new-event-name" autofocus placeholder="Event Name">
+                      <label class="mdl-textfield__label" for="new-event-name">What do you want to name your event?</label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label class="mdl-textfield__label" for="new-event-type">What type of event is it?</label>
+                    <input class="mdl-textfield__input" type="text" list="new-event-list" id="new-event-type" name="new-event-type" placeholder="Event Type">
+                    <datalist id="new-event-list">
+                      <option value="Birthday">
+                      <option value="Anniversary">
+                      <option value="Farewell">
+                      <option value="New Year">
+                    </datalist>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-host" name="new-event-host" placeholder="Host">
+                    <label class="mdl-textfield__label" for="new-event-host">Who is hosting the event?</label>
+                  </div>
+                </div>
+                <div class="step" id="step2">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label class="mdl-textfield__label" for="new-event-start-time">When the event will start?</label>
+                    <input class="mdl-textfield__input" type="date" id="new-event-start-date" name="new-event-start-date" placeholder="">
+                    <input class="mdl-textfield__input" type="time" step=900 id="new-event-start-time" name="new-event-start-time" required="required">
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label class="mdl-textfield__label" for="new-event-end-time">When the event will end?</label>
+                    <input class="mdl-textfield__input" type="date" id="new-event-end-date" name="new-event-end-date" placeholder="">
+                    <input class="mdl-textfield__input" type="time" id="new-event-end-time" name="new-event-end-time" >
+                  </div>
+                </div>
+                <div class="step" id="step3">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-location" name="new-event-location" onFocus="geolocate()" placeholder="Location" >
+                    <label class="mdl-textfield__label" for="new-event-location">What is the location for the event?</label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="new-event-guests" name="new-event-guests" placeholder="Guests">
+                    <label class="mdl-textfield__label" for="new-event-guests">Whom do you want to invite for the event?</label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <textarea class="mdl-textfield__input" rows="3" id="new-event-message" name="new-event-message" placeholder="Message..."></textarea>
+                    <label class="mdl-textfield__label" for="new-event-message">Any message for the guests?</label>
+                  </div>
+                </div>
+                <div class="step display" id="step4">
+                  <h2 class="mdl-card__title-text">Confirm Details</h2>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Event Name: </label>
+                    <label class="lbl" data-id="new-event-name"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Event Type: </label>
+                    <label class="lbl" data-id="new-event-type"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Host of the Event: </label>
+                    <label class="lbl" data-id="new-event-host"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Event Start Date and Time </label>
+                    <label class="lbl" data-id="new-event-start-date"></label>
+                    <label class="lbl" data-id="new-event-start-time"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Event End Date and Time: </label>
+                    <label class="lbl" data-id="new-event-end-date"></label>
+                    <label class="lbl" data-id="new-event-end-time"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Event Location: </label>
+                    <label class="lbl" data-id="new-event-location"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Guest List: </label>
+                    <label class="lbl" data-id="new-event-guests"></label>
+                  </div>
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <label class="lblhdr">Message for Guests: </label>
+                    <label class="lbl" data-id="new-event-message"></label>
+                  </div>
+                </div>
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect action btn-hot text-capitalize back btn">Back</button>
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect action btn-hot  text-capitalize next btn">Next</button>
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect action btn-hot  text-capitalize create btn"">
+                  Create
+                </button>
+              </form>
+            </div>
+        </div>
+      </div>
+    </section>
+    <!-- Show a list of recent events -->
+    <section class="mdl-grid content" id="recent-events-list" style="display:none">
+      <div class="events-container mdl-cell mdl-cell--12-col mdl-grid">
+      </div>
+    </section>
+    <!-- Show the list of user's events -->
+    <section class="mdl-grid content" id="user-events-list" style="display:none">
+      <div class="events-container mdl-cell mdl-cell--12-col mdl-grid">
+      </div>
+    </section>
+    <!-- Show the list of top user's events -->
+    <section class="mdl-grid content" id="top-user-events-list" style="display:none">
+      <div class="events-container mdl-cell mdl-cell--12-col mdl-grid">
+      </div>
+    </section>
+  </main>
+</div>
+<script src="scripts/main.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    // validate welcome-form
+    $('#welcome-form').validate({ // initialize plugin
+    ignore:":not(:visible)",
+      rules: {
+        "email": {
+          required: true,
+          email: true
+        },
+        "password": {
+          required: true,
+        }
+      },
+      messages: {
+        'email': {
+          required: "Please enter an email",
+          email: "Enter valid email",
+        },
+        'password': {
+          required: "Please enter a password",
+        }
+      }
+    });
+
+    //Validate sign-up form
+    $('#signup-form').validate({ // initialize plugin
+    ignore:":not(:visible)",
+      rules: {
+        "new-user-name": {
+          required: true,
+          minlength: 4
+        },
+        "new-user-email": {
+          required: true,
+          email: true
+        },
+        "confirm-new-user-email": {
+          required: true,
+          email: true,
+          equalTo: "#new-user-email"
+        },
+        "new-user-password": {
+          required: true,
+          minlength: 6,
+          checkStrength: true
+        }
+      },
+      messages: {
+        'new-user-name': {
+          required: "Please enter the User Name",
+          minlength: "User Name should be at least 4 characters"
+        },
+        'new-user-email': {
+          required: "Please enter an email",
+          email: "Enter valid email"
+        },
+        'confirm-new-user-email': {
+          required: "Please enter the email again",
+          email: "Enter valid email",
+          equalTo: "Should be same as the email above"
+        },
+        'new-user-password': {
+          required: "Please enter a password",
+          minlength: "Password should be minimum 6 characters",
+        }
+      }
+    });
+    // Password strength validation method
+    jQuery.validator.addMethod("checkStrength", function(value, element) {
+      return  passwordStrength();
+    }, "Password should contain at least one uppercase character and one number");
+    // Function to check password validation
+    function passwordStrength() {
+      var newUserPassword = $("#new-user-password").val();
+      var endDate = $("#new-event-end-date").val();
+      if (!newUserPassword.match(/\d/g) || !newUserPassword.match(/[A-Z]/g)) {
+            return false;
+        } else {
+          return true;
+        }
+    }
+
+    // Event form validation
+    var current = 1;
+    widget      = $(".step");
+    btnnext     = $(".next");
+    btnback     = $(".back");
+    btnsubmit   = $(".create");
+    // Init buttons and UI
+    widget.not(':eq(0)').hide();
+    hideButtons(current);
+    setProgress(current);
+    // Next button click action
+    btnnext.click(function(){
+      if(current < widget.length){
+
+        // Check validation
+        if($("#event-form").valid()){
+          widget.show();
+          widget.not(':eq('+(current++)+')').hide();
+          setProgress(current);
+        }
+      }
+      hideButtons(current);
+    })
+    // Back button click action
+    btnback.click(function(){
+      if(current > 1){
+        current = current - 2;
+        if(current < widget.length){
+          widget.show();
+          widget.not(':eq('+(current++)+')').hide();
+          setProgress(current);
+        }
+      }
+      hideButtons(current);
+    })
+    // Submit button click action
+    btnsubmit.click(function(){
+      current = 1;
+      hideButtons(current);
+      setProgress(current);
+    })
+    $('#event-form').validate({ // initialize plugin
+    ignore:":not(:visible)",
+      rules: {
+        "new-event-name": {
+          required: true,
+          minlength: 4
+        },
+        'new-event-type': {
+          required: true,
+          minlength: 4
+        },
+        'new-event-host': {
+          required: true,
+          minlength: 2
+        },
+        'new-event-start-date': {
+          required: true,
+          date: true,
+          checkStartDate: true
+        },
+        'new-event-start-time': {
+          required: true,
+          timeCheck: true,
+          checkStartDateTime: true
+        },
+        'new-event-end-date': {
+          required: true,
+          date: true,
+          checkDates: true
+        },
+        'new-event-end-time': {
+          required: true,
+          timeCheck: true,
+          checkTimes: true
+        },
+        'new-event-location': "required",
+        'new-event-guests': "required"
+      },
+      messages: {
+        'new-event-name': {
+          required: "Please enter an Event Name",
+          minlength: "Event Name should be at least 4 characters"
+        },
+        'new-event-type': {
+          required: "Please enter an Event Type",
+          minlength: "Event Type should be at least 4 characters"
+        },
+        'new-event-host': {
+          required: "Please enter the name of the host",
+          minlength: "Event Type should be at least 2 characters"
+        },
+        'new-event-start-date': {
+          required: "Please enter the date of an event",
+          date: "Please enter a valid date"
+        },
+        'new-event-start-time': {
+          required: "Please enter the start time of an event",
+          time: "Please enter a valid time"
+        },
+        'new-event-end-date': {
+          required: "Please enter the end date of an event",
+          date: "Please enter a valid end date"
+        },
+        'new-event-end-time': {
+          required: "Please enter the end time of an event",
+          time: "Please enter a valid end time"
+        },
+        'new-event-location': "Please enter the location of the event",
+        'new-event-guests': "Please enter the list of guests"
+      }
+    });
+    $.validator.addMethod("timeCheck", function(value, element) {
+      //console.log("in timecheck" + value);
+      return this.optional(element) || /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/i.test(value);
+    }, "Please enter a valid time.");
+    /* change the select value to an integer to add to unix time of date from datepicker*/
+    $.fn.parseValToNumber = function() {
+      return parseInt($(this).val().replace(':',''), 10) || 0;
+    }
+    function compareDates() {
+      var startDate = $("#new-event-start-date").val();
+      var endDate = $("#new-event-end-date").val();
+      if( !startDate || !endDate){
+          return false;
+      }
+      if(endDate > startDate) {
+          return true;
+      } else if (endDate == startDate){
+        var endTime = $('#new-event-end-time').parseValToNumber();
+          var startTime = $('#new-event-start-time').parseValToNumber();
+        return endTime > startTime;
+      } else {
+        return false;
+      }
+    }
+    //Convert a date to object form
+    function parseDate(s) {
+      var b = s.split(/\D/);
+      return new Date(b[0], --b[1], b[2]);
+    }
+    //Validate start date/time is in future
+    function compareStartDateTime() {
+      var startdatevalue = $("#new-event-start-date").val();
+      var starttimevalue = $("#new-event-start-time").val();
+      var currentdatetime = new Date();
+      var currentdate = new Date();
+      currentdate.setHours(0,0,0,0);
+      // Return false if start date it in past
+      //console.log(parseDate(startdatevalue) + "=" + currentdate);
+      if (parseDate(startdatevalue) < currentdate) {
+        //console.log("in if..");
+        return false;
+      } else if (parseDate(startdatevalue) > currentdate){
+        //console.log("in else if..");
+        return true;
+      } else {
+        //console.log("in else..");
+        var startHour = parseInt(starttimevalue.substr(0,2));
+        var startMin = parseInt(starttimevalue.substr(3,2));
+        var currentHour = currentdatetime.getHours();
+        var currentMin = currentdatetime.getMinutes();
+        if (((startHour * 60) + startMin) < ((currentHour * 60) + currentMin)) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
+    // End time validation method
+    jQuery.validator.addMethod("checkTimes", function(value, element) {
+      return  compareDates();
+    }, "End time must be after start time");
+
+    // End date validation method
+    jQuery.validator.addMethod("checkDates", function(value, element) {
+      var startdatevalue = $("#new-event-start-date").val();
+      return Date.parse(startdatevalue) <= Date.parse(value);
+    },"End date cannot be before start date");
+
+    // Start date validation method
+    jQuery.validator.addMethod("checkStartDate", function(value, element) {
+      var startdatevalue = $("#new-event-start-date").val();
+      var currentdate = new Date();
+      currentdate.setHours(0,0,0,0);
+      return (parseDate(startdatevalue) >= currentdate);
+    },"Start date should be current/future");
+
+    // Start date/time validation method
+    jQuery.validator.addMethod("checkStartDateTime", function(value, element) {
+      return compareStartDateTime();
+    },"Start time should be in future");
+  });
+  //End of ready function
+  // Change progress bar action
+  setProgress = function(currstep){
+    var widthPercent;
+    var percent = parseFloat(100 / widget.length) * (currstep -1 );
+    if (percent == 0) {
+      widthPercent = 5;
+    } else {
+      widthPercent = percent;
+    }
+    percent = percent.toFixed();
+    $(".progress-bar").css("width", widthPercent+"%").html(percent + "%");
+  }
+  // Hide buttons according to the current step
+  hideButtons = function(current){
+    var limit = parseInt(widget.length);
+    $(".action").hide();
+    if(current < limit) btnnext.show();
+    if(current > 1) btnback.show();
+    if (current == limit) {
+      // Show entered values
+      $(".display label.lbl").each(function(){
+        $(this).html($("#"+$(this).data("id")).val());
+      });
+      btnnext.hide();
+      btnsubmit.show();
+    }
+  }
+</script>
+<script>
+      // Displays an address form, using the autocomplete feature
+      // of the Google Places API to help users fill in the information.
+      var placeSearch, autocomplete;
+      var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        country: 'long_name',
+        postal_code: 'short_name'
+      };
+      function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('new-event-location')),
+            {types: ['geocode']});
+      }
+      function geolocate() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+          });
+        }
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEVmkzLvnIJ0tx3JS_hU2b6-985CiJGEM&libraries=places&callback=initAutocomplete"
+        async defer></script>
+</body>
+</html>
