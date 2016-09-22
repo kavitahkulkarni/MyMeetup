@@ -420,22 +420,22 @@ window.addEventListener('load', function() {
     var password = passwordInput.value;
     // Sign in with email and pass.
     // [START authwithemail]
-    if (password.length >=1) {
+    if($("#welcome-form").valid()){
       firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
         // [START_EXCLUDE]
         if (errorCode === 'auth/wrong-password') {
-          alert('Password doesn\'t match.');
+          alert('Invalid password.');
         } else if (errorCode === 'auth/user-not-found') {
           alert('You seem to be a new user, please signup first')
         }
         console.log(error);
         // [END_EXCLUDE]
       });
+      // [END authwithemail]
       }
-    // [END authwithemail]
   };
 
 
@@ -446,14 +446,23 @@ window.addEventListener('load', function() {
     var password = newUserPassword.value;
     var userName = newUserName.value;
     var confirmEmail = confirmNewUserEmail.value;
-
+    if($("#signup-form").valid()){
     // Sign in with email and pass.
     // [START createwithemail]
     firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-      // Handle Errors here.
-      console.log(error);
-      // [END_EXCLUDE]
+      // Handle Errors here
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // [START_EXCLUDE].
+      if (errorCode === 'auth/invalid-email') {
+        alert('Enter valid email');
+      } else {
+        alert(error.message);
+        console.log(error);
+        // [END_EXCLUDE]
+      }
     });
+  }
     // [END createwithemail]
  // });
 };
