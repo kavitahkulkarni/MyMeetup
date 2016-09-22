@@ -112,10 +112,10 @@ h3 {
     .welcome-page-label{
         font-size: 8px;
     }
-    .mdl-layout {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-}
+    #page-splash{
+        overflow-y: scroll; /* has to be scroll, not auto */
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 /* Signed-in user */
