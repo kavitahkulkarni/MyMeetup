@@ -48,6 +48,7 @@ h3 {
 .mdl-textfield {
     width: 100%;
 }
+
 /* Fixes an MDL bug where the header does not scroll on small devices */
 .mdl-layout__container .mdl-layout--fixed-header .mdl-layout__content {
     overflow-y: visible;
@@ -111,6 +112,10 @@ h3 {
     .welcome-page-label{
         font-size: 8px;
     }
+    .mdl-layout {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
 }
 
 /* Signed-in user */
