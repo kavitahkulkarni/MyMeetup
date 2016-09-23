@@ -51,9 +51,12 @@ h3 {
 
 /* Fixes an MDL bug where the header does not scroll on small devices */
 .mdl-layout__container .mdl-layout--fixed-header .mdl-layout__content {
-    overflow-y: visible;
+/*    overflow-y: visible;
     overflow-x: visible;
-    overflow: visible;
+    overflow: visible; */
+    overflow-y: scroll;
+    overflow-x: scroll;
+    overflow: scroll;
 }
 /* Overrides MDL colors */
 .mdl-layout.is-upgraded .mdl-layout__tab.is-active::after,
