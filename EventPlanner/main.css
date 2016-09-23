@@ -112,10 +112,6 @@ h3 {
     .welcome-page-label{
         font-size: 8px;
     }
-    #page-splash{
-        overflow-y: scroll; /* has to be scroll, not auto */
-        -webkit-overflow-scrolling: touch;
-    }
 }
 
 /* Signed-in user */
@@ -346,8 +342,9 @@ h3 {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
+    overflow-y: scroll;
 
+}
 /* Progress bar and multi step form */
 .progress-bar {
   overflow: hidden;
