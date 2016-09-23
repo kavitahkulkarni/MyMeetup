@@ -41,6 +41,7 @@
   <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" type="text/css">
+  <!-- <link rel="stylesheet" href="jquery-ui.min.css"> -->
   <link rel="stylesheet" href="jquery.timepicker.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script src="scripts/jquery-ui.min.js"></script>
@@ -80,11 +81,11 @@
 </script>
 </head>
 <body>
-<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout__content">
   <!-- Splash screen -->
   <section id="page-splash">
     <h3 class="logo" id="title-header">Events!!!</h3>
-    <div>
+    <div class="mdl-grid content">
       <div class="mdl-cell mdl-cell--12-col mdl-grid">
         <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--8-col-tablet
                   mdl-cell--12-col-desktop">
@@ -140,7 +141,7 @@
                   <input class="mdl-textfield__input" type="text" id="new-user-name" name="new-user-name" placeholder="FirstName LastName" required>
                 </div>
                 <div>
-                  <label class="sign-up-label" for="new-user-email">What's you eMail address?</label>
+                  <label class="sign-up-label" for="new-user-email">What's your eMail address?</label>
                   <input class="mdl-textfield__input" type="email" id="new-user-email" name="new-user-email" placeholder="email@domain.com" required>
                 </div>
                 <div>
@@ -351,12 +352,14 @@
         },
         "new-user-email": {
           required: true,
-          email: true
+          email: true,
+          emailCheck: true
         },
         "confirm-new-user-email": {
           required: true,
+          equalTo: "#new-user-email",
           email: true,
-          equalTo: "#new-user-email"
+          emailCheck: true
         },
         "new-user-password": {
           required: true,
@@ -371,12 +374,12 @@
         },
         'new-user-email': {
           required: "Please enter an email",
-          email: "Enter valid email"
+          email: "Please enter valid email"
         },
         'confirm-new-user-email': {
           required: "Please enter the email again",
-          email: "Enter valid email",
-          equalTo: "Should be same as the email above"
+          equalTo: "Should be same as the email above",
+          email: "Please enter valid email"
         },
         'new-user-password': {
           required: "Please enter a password",
@@ -398,6 +401,14 @@
           return true;
         }
     }
+
+    // email validation method
+    jQuery.validator.addMethod("emailCheck", function(value, element) {
+      var atpos = value.indexOf("@");
+      var dotpos = value.lastIndexOf(".");
+      return  (atpos>=1 && dotpos>=atpos+2 && dotpos+2<value.length);
+    }, "Please enter valid email");
+
 
     // Event form validation
     var current = 1;
