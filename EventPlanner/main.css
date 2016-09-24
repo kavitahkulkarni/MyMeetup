@@ -348,6 +348,7 @@ h3 {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 /* Progress bar and multi step form */
