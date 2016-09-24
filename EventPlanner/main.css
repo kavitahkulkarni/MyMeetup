@@ -20,11 +20,7 @@ a {
     display: block;
 }
 h3 {
-/*    background-size: 40px;
-    padding-left: 50px;
-    background-position-y: -2px; */
     font-size: 32px;
-/*    margin: 0px; */
 }
 #title-header {
     margin: 0px;
@@ -55,6 +51,7 @@ h3 {
     overflow-x: visible;
     overflow: visible;
 }
+
 /* Overrides MDL colors */
 .mdl-layout.is-upgraded .mdl-layout__tab.is-active::after,
 .header .mdl-textfield__label:after {
@@ -91,8 +88,8 @@ h3 {
     position: relative;
 }
 @media screen and (max-width: 840px) {
-    .header .mdl-layout__header-row.titlebar {
-        /*height: 56px; */
+    .header .mdl-layout__header-row .titlebar {
+        height: 56px;
     }
     .titlebar h3 {
         font-size: 24px;
@@ -111,10 +108,6 @@ h3 {
     }
     .welcome-page-label{
         font-size: 8px;
-    }
-    #page-splash{
-        overflow-y: scroll; /* has to be scroll, not auto */
-        -webkit-overflow-scrolling: touch;
     }
 }
 
@@ -171,6 +164,15 @@ h3 {
 @media screen and (max-width: 609px) {
     .header .mdl-tab {
         width: auto;
+    }
+}
+@media screen and (max-width: 479px) {
+    .header .mdl-tab {
+        width: auto;
+        padding: 0;
+    }
+    .sml-hdr {
+        font-size: 12px;
     }
 }
 .header .tab {
@@ -346,9 +348,8 @@ h3 {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    overflow-y: scroll;
-
 }
+
 /* Progress bar and multi step form */
 .progress-bar {
   overflow: hidden;

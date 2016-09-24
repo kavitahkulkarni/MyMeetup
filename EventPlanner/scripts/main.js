@@ -476,7 +476,7 @@ window.addEventListener('load', function() {
     if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.length) {
       alert("Enter a valid e-mail");
     } else {
-      alert('SEND PASSWORD RESET button is pressed to send password to e-mail: ' + email + '! (Doesn\'t send the actual email :))');
+      alert('SEND PASSWORD RESET button is pressed to send password reset link to e-mail: ' + email + '!\n(It doesn\'t send the actual email :))');
     }
 });
 
